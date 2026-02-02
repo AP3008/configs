@@ -1,4 +1,4 @@
-# Config
+# Configs
 
 ## What is this
 
