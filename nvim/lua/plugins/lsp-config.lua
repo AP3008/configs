@@ -9,7 +9,11 @@ return {
         "williamboman/mason-lspconfig.nvim",
         config = function()
             require("mason-lspconfig").setup({
-                ensure_installed = { "lua_ls", "pylsp", "ts_ls", "html", "cssls", "bashls" },
+                -- Including the specific servers you've installed for Python and Web
+                ensure_installed = { 
+                    "lua_ls", "basedpyright", "ts_ls", 
+                    "html", "cssls", "bashls" 
+                },
             })
         end,
     },
@@ -17,16 +21,18 @@ return {
         "neovim/nvim-lspconfig",
         dependencies = { "hrsh7th/cmp-nvim-lsp" },
         config = function()
-            local servers = { "lua_ls", "pylsp", "ts_ls", "html", "cssls", "bashls" }
             local capabilities = require('cmp_nvim_lsp').default_capabilities()
 
-            local lspconfig = require('lspconfig')
-            lspconfig.util.default_config = vim.tbl_deep_extend(
-                "force",
-                lspconfig.util.default_config,
-                { capabilities = capabilities }
-            )
+            -- Define your servers
+            local servers = { "lua_ls", "basedpyright", "ts_ls", "html", "cssls", "bashls" }
 
+            -- Modern way to apply global capabilities (replaces util.default_config)
+            vim.lsp.config("*", {
+                capabilities = capabilities,
+            })
+
+            -- Modern configuration for specific LSPs
+            -- Note: We use vim.lsp.config to define settings, then vim.lsp.enable to start them
             vim.lsp.config("lua_ls", {
                 settings = {
                     Lua = {
@@ -35,10 +41,23 @@ return {
                 },
             })
 
+            -- Basedpyright is better for your Python projects (CityScope/Savify)
+            vim.lsp.config("basedpyright", {
+                settings = {
+                    basedpyright = {
+                        analysis = {
+                            typeCheckingMode = "basic", -- High performance for large projects
+                        }
+                    }
+                }
+            })
+
+            -- Enable all servers
             for _, lsp in ipairs(servers) do
                 vim.lsp.enable(lsp)
             end
             
+            -- Keymaps remain the same
             vim.keymap.set('n', 'K', vim.lsp.buf.hover, {})
             vim.keymap.set('n', 'gd', vim.lsp.buf.definition, {})
             vim.keymap.set('n', '<leader>ca', vim.lsp.buf.code_action, {})
