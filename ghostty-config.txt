@@ -2,7 +2,7 @@
 
 # Theme & Appearance
 theme = Catppuccin Mocha
-background-opacity = 0.88
+background-opacity = 1
 window-colorspace = display-p3
 macos-titlebar-style = transparent
 # Optional: makes the padding look uniform on all sides
