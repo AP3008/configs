@@ -9,10 +9,9 @@ return {
         "williamboman/mason-lspconfig.nvim",
         config = function()
             require("mason-lspconfig").setup({
-                -- Including the specific servers you've installed for Python and Web
                 ensure_installed = { 
                     "lua_ls", "basedpyright", "ts_ls", 
-                    "html", "cssls", "bashls" 
+                    "html", "cssls", "bashls", "rust_analyzer" 
                 },
             })
         end,
@@ -23,16 +22,32 @@ return {
         config = function()
             local capabilities = require('cmp_nvim_lsp').default_capabilities()
 
-            -- Define your servers
-            local servers = { "lua_ls", "basedpyright", "ts_ls", "html", "cssls", "bashls" }
+            -- 1. GLOBAL DIAGNOSTICS (Inline Errors)
+            vim.diagnostic.config({
+                virtual_text = {
+                    spacing = 4,
+                    prefix = "●",
+                },
+                underline = true,
+                update_in_insert = false,
+                severity_sort = true,
+                float = { border = "rounded" },
+            })
 
-            -- Modern way to apply global capabilities (replaces util.default_config)
+            -- 2. TOGGLE DIAGNOSTICS KEYMAP
+            vim.keymap.set('n', '<leader>td', function()
+                local is_enabled = vim.diagnostic.is_enabled()
+                vim.diagnostic.enable(not is_enabled)
+                print("Diagnostics: " .. (not is_enabled and "ON" or "OFF"))
+            end, { desc = "Toggle Inline Errors" })
+
+            local servers = { "lua_ls", "basedpyright", "ts_ls", "html", "cssls", "bashls"}
+
+
             vim.lsp.config("*", {
                 capabilities = capabilities,
             })
 
-            -- Modern configuration for specific LSPs
-            -- Note: We use vim.lsp.config to define settings, then vim.lsp.enable to start them
             vim.lsp.config("lua_ls", {
                 settings = {
                     Lua = {
@@ -41,12 +56,11 @@ return {
                 },
             })
 
-            -- Basedpyright is better for your Python projects (CityScope/Savify)
             vim.lsp.config("basedpyright", {
                 settings = {
                     basedpyright = {
                         analysis = {
-                            typeCheckingMode = "basic", -- High performance for large projects
+                            typeCheckingMode = "basic",
                         }
                     }
                 }
@@ -57,7 +71,7 @@ return {
                 vim.lsp.enable(lsp)
             end
             
-            -- Keymaps remain the same
+            -- Keymaps
             vim.keymap.set('n', 'K', vim.lsp.buf.hover, {})
             vim.keymap.set('n', 'gd', vim.lsp.buf.definition, {})
             vim.keymap.set('n', '<leader>ca', vim.lsp.buf.code_action, {})

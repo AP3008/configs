@@ -12,6 +12,7 @@ return {
                 "javascript", 
                 "typescript", 
                 "bash", 
+				"rust", 
                 "html", 
                 "css", 
                 "markdown", 
