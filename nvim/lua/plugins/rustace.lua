@@ -5,19 +5,28 @@ return {
   config = function()
     vim.g.rustaceanvim = {
       server = {
-        -- This is the magic bit for standalone files
-        standalone = true, 
+        -- 1. Enable standalone mode for single-file scripts
+        standalone = true,
         default_settings = {
           ['rust-analyzer'] = {
-            checkOnSave = {
-              command = "clippy",
-            },
-            -- This helps with single-file performance
-            imports = {
-                granularity = {
-                    group = "module",
+            -- 2. This helps find files that aren't explicitly in a module tree
+            cargo = {
+                allFeatures = true,
+                loadOutDirsFromCheck = true,
+                buildScripts = {
+                    enable = true,
                 },
-                prefix = "self",
+            },
+            -- 3. Proc-macros are essential for high-level Rust crates
+            procMacro = {
+                enable = true,
+            },
+            checkOnSave = {
+                command = "clippy",
+            },
+            -- 4. This specifically addresses the "not in module tree" error
+            diagnostics = {
+                disabled = { "unresolved-proc-macro" },
             },
           },
         },
