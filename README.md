@@ -1,4 +1,4 @@
-# Configs
+# Dotfiles
 
 ## What is this
 
